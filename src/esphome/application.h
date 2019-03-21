@@ -1132,7 +1132,7 @@ class Application {
 #endif
 
 #ifdef USE_CAT9554
-  io::CAT9554Component *make_cat9554_component(uint8_t address = 0x20);
+  io::CAT9554Component *make_cat9554_component(uint8_t address, uint8_t irq);
 #endif
 
 #ifdef USE_MCP23017

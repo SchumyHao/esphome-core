@@ -576,8 +576,8 @@ PCF8574Component *Application::make_pcf8574_component(uint8_t address, bool pcf8
 #endif
 
 #ifdef USE_CAT9554
-CAT9554Component *Application::make_cat9554_component(uint8_t address) {
-  return this->register_component(new CAT9554Component(this->i2c_, address));
+CAT9554Component *Application::make_cat9554_component(uint8_t address, uint8_t irq) {
+  return this->register_component(new CAT9554Component(this->i2c_, address, irq));
 }
 #endif
 

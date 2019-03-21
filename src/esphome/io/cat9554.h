@@ -29,7 +29,7 @@ class CAT9554GPIOOutputPin;
 
 class CAT9554Component : public Component, public I2CDevice {
  public:
-  CAT9554Component(I2CComponent *parent, uint8_t address);
+  CAT9554Component(I2CComponent *parent, uint8_t address, uint8_t irq);
 
   CAT9554GPIOInputPin make_input_pin(uint8_t pin, bool inverted = false);
 
@@ -50,8 +50,11 @@ class CAT9554Component : public Component, public I2CDevice {
 
   void dump_config() override;
 
- protected:
   bool read_gpio_();
+ protected:
+  uint8_t irq_;
+  GPIOInputPin *pin_;
+  ISRInternalGPIOPin *isr_;
   bool write_gpio_();
   bool config_gpio_();
   bool read_config_();

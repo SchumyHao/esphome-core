@@ -14,8 +14,13 @@ namespace io {
 
 static const char *TAG = "io.cat9554";
 
-CAT9554Component::CAT9554Component(I2CComponent *parent, uint8_t address)
-    : Component(), I2CDevice(parent, address) {}
+static CAT9554Component *instance_;
+static void ICACHE_RAM_ATTR HOT gpio_intr(CAT9554Component **instance) {
+  (*instance)->read_gpio_();
+}
+
+CAT9554Component::CAT9554Component(I2CComponent *parent, uint8_t address, uint8_t irq)
+    : Component(), I2CDevice(parent, address), irq_(irq) {}
 
 void CAT9554Component::setup() {
   ESP_LOGCONFIG(TAG, "Setting up CAT9554...");
@@ -26,10 +31,16 @@ void CAT9554Component::setup() {
     return;
   }
 
+  instance_ = this;
+  this->pin_ = new GPIOInputPin(this->irq_);
+  this->pin_->setup();
+  this->isr_ = this->pin_->to_isr();
+  this->pin_->attach_interrupt(gpio_intr, &instance_, FALLING);
   //this->write_gpio_();
   this->read_gpio_();
   this->read_config_();
 }
+
 void CAT9554Component::dump_config() {
   ESP_LOGCONFIG(TAG, "CAT9554:");
   ESP_LOGCONFIG(TAG, "    Address: 0x%02X", this->address_);
@@ -38,7 +49,6 @@ void CAT9554Component::dump_config() {
   }
 }
 bool CAT9554Component::digital_read(uint8_t pin) {
-  this->read_gpio_();
   return this->input_mask_ & (1 << pin);
 }
 void CAT9554Component::digital_write(uint8_t pin, bool value) {
@@ -94,7 +104,15 @@ bool CAT9554Component::config_gpio_() {
   if (this->is_failed())
     return false;
 
+  if (!this->parent_->write_byte(this->address_, INPUT_REG & 0xff, this->config_mask_)) {
+    this->status_set_warning();
+    return false;
+  }
   if (!this->parent_->write_byte(this->address_, CONFIG_REG & 0xff, this->config_mask_)) {
+    this->status_set_warning();
+    return false;
+  }
+  if (!this->parent_->write_byte(this->address_, INPUT_REG & 0xff, 0x00)) {
     this->status_set_warning();
     return false;
   }
