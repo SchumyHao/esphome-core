@@ -1,3 +1,7 @@
+# NOTICE
+
+This repo is moeved to [**smarthomefans**](https://github.com/smarthomefans/esphome-core)
+
 # ESPHome-Core [![Build Status](https://travis-ci.org/esphome/esphome-core.svg?branch=master)](https://travis-ci.org/esphome/esphome-core) [![Discord Chat](https://img.shields.io/discord/429907082951524364.svg)](https://discord.gg/KhAMKrd) [![GitHub release](https://img.shields.io/github/release/esphome/esphome-core.svg)](https://GitHub.com/esphome/esphome-core/releases/)
 
 [![ESPHome Core Logo](https://esphome.io/_images/logo-core.png)](https://esphome.io/)
